@@ -10,5 +10,6 @@ type RotationPolicy struct {
 	WeeklyRetentionCount int
 	WeeklyPrefix string
 	MonthlyPrefix string
+	EnforceRetentionPeriod bool
 }
 
