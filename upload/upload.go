@@ -76,7 +76,7 @@ func UploadFile(svc *s3.S3, uploadObject UploadObject, policy rpolicy.RotationPo
 
 	partSize := int64(50 * 1024 * 1024) // 50 MiB
 
-	log.Info.Printf("Upload part size is: %d bytes", partSize)
+	log.Info.Printf("Upload part size is: %d bytes\n", partSize)
 
 	finishedCh := make(chan bool)
 
@@ -85,12 +85,12 @@ func UploadFile(svc *s3.S3, uploadObject UploadObject, policy rpolicy.RotationPo
 			<-finishedCh
 		} else {
 			totalParts := int64(math.Ceil(float64(fileSize) / float64(partSize))) // Round up
-			log.Info.Printf("Upload is larger than %d bytes and therefore will be uploaded in %d chunks", partSize, totalParts)
+			log.Info.Printf("Upload is larger than %d bytes and therefore will be uploaded in %d chunks\n", partSize, totalParts)
 			checkUploadProgress(svc, s3FileName, uploadObject.Bucket, partSize, totalParts, finishedCh) // Attempt to track progress of file upload
 		}
 	}()
 
-	log.Info.Printf("Uploading is about to begin with a maximum of %d workers", uploadObject.NumWorkers)
+	log.Info.Printf("Uploading is about to begin with a maximum of %d workers\n", uploadObject.NumWorkers)
 
 	uploader := s3manager.NewUploaderWithClient(svc, func(u *s3manager.Uploader) {
 		u.PartSize = partSize                   // 50MiB part size. Limit of 10,000 parts. http://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html
@@ -113,7 +113,7 @@ func UploadFile(svc *s3.S3, uploadObject UploadObject, policy rpolicy.RotationPo
 
 	if err != nil {
 		if strings.Contains(err.Error(), "context deadline exceeded") {
-			log.Error.Printf("failed to upload file due to upload time exceeding specified timeout %v", err)
+			log.Error.Printf("failed to upload file due to upload time exceeding specified timeout %v\n", err)
 		} else {
 			log.Error.Printf("Failed to upload file: %v\n", err)
 		}
