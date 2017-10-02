@@ -38,7 +38,15 @@ func init() {
 	aws_profile := os.Getenv("AWS_PROFILE")
 	aws_region := os.Getenv("AWS_REGION")
 	aws_bucket := os.Getenv("AWS_BUCKET")
-	svc = s3client.CreateS3Client(aws_credentials, aws_profile, aws_region)
+	s3svc, err := s3client.CreateS3Client(aws_credentials, aws_profile, aws_region)
+
+	if err != nil {
+		log.Error.Println(err)
+		os.Exit(1)
+	}
+
+	svc = s3svc
+
 	bucket = aws_bucket
 
 	dailyRetentionCount = 6

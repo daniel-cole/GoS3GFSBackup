@@ -48,7 +48,14 @@ func init() {
 	aws_bucket := os.Getenv("AWS_BUCKET")
 	aws_forbidden_bucket = os.Getenv("AWS_FORBIDDEN_BUCKET")
 
-	svc = s3client.CreateS3Client(aws_credentials, aws_profile, aws_region)
+	s3svc, err := s3client.CreateS3Client(aws_credentials, aws_profile, aws_region)
+	if err != nil {
+		log.Error.Println(err)
+		os.Exit(1)
+	}
+
+	svc = s3svc
+
 	bucket = aws_bucket
 
 	dailyRetentionCount = 6
@@ -72,7 +79,7 @@ func init() {
 		NumWorkers: 5,
 	}
 
-	err := util.CreateFile(pathToTestFile, []byte("this is just a little test file"))
+	err = util.CreateFile(pathToTestFile, []byte("this is just a little test file"))
 	if err != nil {
 		log.Error.Println("failed to create file required for testing")
 		os.Exit(1)

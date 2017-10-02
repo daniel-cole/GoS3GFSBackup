@@ -84,7 +84,11 @@ func main() {
 			"deleted that which have not exceeded the retention period")
 	}
 
-	svc := s3client.CreateS3Client(args.CredFile, args.Profile, args.Region)
+	svc, err := s3client.CreateS3Client(args.CredFile, args.Profile, args.Region)
+	if err != nil {
+		log.Error.Println(err)
+		os.Exit(1)
+	}
 
 	uploadObject := upload.UploadObject{
 		PathToFile: args.PathToFile,

@@ -2,6 +2,7 @@ package s3client
 
 import (
 	"os"
+	"errors"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -12,7 +13,7 @@ import (
 // Creates an S3 client using:
 // 1. Environment variables if present
 // 2. Use the specified credential file
-func CreateS3Client(credFile string, profile string, region string) *s3.S3 {
+func CreateS3Client(credFile string, profile string, region string) (*s3.S3, error) {
 	accessKey := os.Getenv("AWS_ACCESS_KEY_ID")
 	secretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
 
@@ -40,5 +41,9 @@ func CreateS3Client(credFile string, profile string, region string) *s3.S3 {
 		creds = credentials.NewSharedCredentials(credFile, profile);
 	}
 
-	return s3.New(session, &aws.Config{Region: aws.String(region), Credentials: creds})
+	if creds == nil {
+		return nil, errors.New("failed to retrieve S3 client access key id and access key secret")
+	}
+
+	return s3.New(session, &aws.Config{Region: aws.String(region), Credentials: creds}), nil
 }
