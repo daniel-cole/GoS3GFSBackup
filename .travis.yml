@@ -1,8 +1,13 @@
 language: go
 go:
 - 1.9
+services:
+  - docker
+before_install:
+  - sudo apt-get update
+  - sudo docker pull centos:centos7
 script:
-- go test -v ./...
+  - ./run_tests_and_watch.sh
 env:
   global:
   - secure: iOF5yB3sLTduT5QkOTME+2X4+dA//bfX//q36Gu2BVTrCnnm8gal6Em7B++EgzXE+wrTCD1sF+DyCz1smVSr/d7YEvUWPM4Runam6QvEdYTdy5M+NHfsRO3QyImipBQfcp3DPrndVHTNUcn0FwQTzl4klHAKE+vu0CYWxRYLxzzPRLuTKWuLW1peSc8YwxIdear0QvECLoLWpi2QpJY+oBjA5w/9GVoYLjILd9njSH9GxGgj6SVJDRd+xPLO7C1cKXiCu3E4ossY6HDVbVgjwy+wTpixKZJC4HpFQricPngfnZnPJ3WX2G3KFSaTi8bblnz/0IVEIbn0P0M57wtGnvaMHQR6a2sT3TD031M/f3qwyjl8OzEc2rwwNtUOssxJih9uvYOSuhD4pV++SzfE716XveZHmtUIjggwjl/eA7A9+TIbbELgoXa/z6JRFC4ahW/hWzMhPlMuvlH4hbZ5I67c3ZxdU7dvelJOwY/rDD7gytVPYGyQT1CyEPoYZX7zXRaAutf1J38eGMIdTCnGSx6VxwI97QlSPWo6OEE8m/OPqTJ8b+GMnUg6Py9nUNOee2rzk+0bA5Bek7DhVL+L/z66cn0yoMRhYZMd/WhKA4wiHDs0tsnxAgl19d/y1tAe9VDXDrBC9LRvyOaxFib+FDXradMR4v4gMMtcMzYKlQE=

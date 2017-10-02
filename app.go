@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"time"
-	"fmt"
 	"github.com/alexflint/go-arg"
 	"github.com/daniel-cole/GoS3GFSBackup/rpolicy"
 	"github.com/daniel-cole/GoS3GFSBackup/s3client"
@@ -59,7 +58,7 @@ func main() {
 
 	logArgs(args)
 
-	fmt.Println(`
+	log.Info.Println(`
 	######################################
 	#        GoS3GFSBackup Started       #
 	######################################
@@ -123,7 +122,7 @@ func main() {
 
 	log.Info.Println("Finished GoS3GFSBackup!")
 
-	fmt.Println(`
+	log.Info.Println(`
 	######################################
 	#      GoS3GFSBackup Finished        #
 	######################################

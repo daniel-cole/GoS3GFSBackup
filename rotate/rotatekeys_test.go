@@ -12,6 +12,7 @@ import (
 	"github.com/daniel-cole/GoS3GFSBackup/log"
 	"github.com/daniel-cole/GoS3GFSBackup/util"
 	"strconv"
+	"io/ioutil"
 )
 
 // Test variables
@@ -32,7 +33,7 @@ var pathToTestFile string
 
 // Setup testing
 func init() {
-	log.Init(os.Stdout, os.Stdout, os.Stderr)
+	log.Init(ioutil.Discard, ioutil.Discard, ioutil.Discard)
 
 	aws_credentials := os.Getenv("AWS_CRED_FILE")
 	aws_profile := os.Getenv("AWS_PROFILE")
@@ -252,7 +253,7 @@ func TestFullWeekUpload(t *testing.T) {
 		t.Error("failed to retrieve bucket contents")
 	}
 
-	fmt.Println(len(bucketContents.Contents))
+	log.Info.Println(len(bucketContents.Contents))
 
 	if !util.CheckBucketSize(bucketContents, 7) {
 		t.Error("expected bucket contents to be 7 but got: " + string(len(bucketContents.Contents)))
@@ -700,7 +701,7 @@ func TestTwoMonthsEnforcedRetentionPeriodPositive(t *testing.T) {
 	}
 
 	enforcedRetentionPolicy := rpolicy.RotationPolicy{
-		DailyRetentionPeriod:   time.Second * 20,
+		DailyRetentionPeriod:   time.Second * 18,
 		DailyRetentionCount:    dailyRetentionCount,
 		DailyPrefix:            "daily_",
 		WeeklyRetentionPeriod:  time.Second * 60,
@@ -710,7 +711,7 @@ func TestTwoMonthsEnforcedRetentionPeriodPositive(t *testing.T) {
 		EnforceRetentionPeriod: true,
 	}
 
-	delayBetweenUploads := 5
+	delayBetweenUploads := 3
 
 	SEP_01 := 01
 	currentDay := SEP_01
@@ -825,7 +826,7 @@ func TestDailyRotationEnforcedRetentionPeriodNegative(t *testing.T) {
 		EnforceRetentionPeriod: true,
 	}
 
-	delayBetweenUploads := 5
+	delayBetweenUploads := 3
 
 	SEP_01 := 1
 	SEP_02 := 2

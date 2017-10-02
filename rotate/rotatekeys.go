@@ -1,7 +1,6 @@
 package rotate
 
 import (
-	"fmt"
 	"time"
 	"github.com/daniel-cole/GoS3GFSBackup/log"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -11,7 +10,7 @@ import (
 )
 
 func StartRotation(svc *s3.S3, bucket string, policy rpolicy.RotationPolicy, dryRun bool) []string {
-	fmt.Println(`
+	log.Info.Println(`
 	######################################
 	#  GoS3GFSBackup Rotation Started!   #
 	######################################
@@ -22,7 +21,7 @@ func StartRotation(svc *s3.S3, bucket string, policy rpolicy.RotationPolicy, dry
 	// Keys to be returned at end of both daily and weekly rotation
 	deletedKeys := []string{}
 
-	fmt.Println(`
+	log.Info.Println(`
 	######################################
 	#   Starting Daily Key Rotation!     #
 	######################################
@@ -33,7 +32,7 @@ func StartRotation(svc *s3.S3, bucket string, policy rpolicy.RotationPolicy, dry
 		deletedKeys = append(deletedKeys, key)
 	}
 
-	fmt.Println(`
+	log.Info.Println(`
 	######################################
 	#   Starting Weekly Key Rotation!    #
 	######################################
@@ -44,7 +43,7 @@ func StartRotation(svc *s3.S3, bucket string, policy rpolicy.RotationPolicy, dry
 		deletedKeys = append(deletedKeys, key)
 	}
 
-	fmt.Println(`
+	log.Info.Println(`
 	######################################
 	#         Key Rotation Summary       #
 	######################################
@@ -65,7 +64,7 @@ func StartRotation(svc *s3.S3, bucket string, policy rpolicy.RotationPolicy, dry
 func keyRotation(svc *s3.S3, bucket string, retentionPeriod time.Duration, retentionCount int, prefix string, enforceRetentionPeriod bool, dryRun bool) []string {
 	sortedKeys, err := sortKeysAndLogInfo(svc, bucket, prefix) // Requirement that the keys are sorted before rotating
 
-	fmt.Println(`
+	log.Info.Println(`
 	######################################
 	#           Rotating Keys!           #
 	######################################
@@ -143,7 +142,7 @@ func keyRotation(svc *s3.S3, bucket string, retentionPeriod time.Duration, reten
 // Returns an array of sorted keys by LastModified date.
 // The first value in the array is the most recently modified key
 func sortKeysAndLogInfo(svc *s3.S3, bucket string, prefix string) ([]s3client.BucketEntry, error) {
-	fmt.Println(`
+	log.Info.Println(`
 	######################################
 	#        Retrieving Key Info!        #
 	######################################

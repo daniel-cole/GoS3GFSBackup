@@ -12,6 +12,7 @@ import (
 	"github.com/daniel-cole/GoS3GFSBackup/rpolicy"
 	"github.com/daniel-cole/GoS3GFSBackup/util"
 	"github.com/daniel-cole/GoS3GFSBackup/s3client"
+	"io/ioutil"
 )
 
 // Test variables
@@ -40,7 +41,7 @@ var aws_forbidden_bucket string
 
 // Setup testing
 func init() {
-	log.Init(os.Stdout, os.Stdout, os.Stderr)
+	log.Init(ioutil.Discard, ioutil.Discard, ioutil.Discard)
 
 	aws_credentials := os.Getenv("AWS_CRED_FILE")
 	aws_profile := os.Getenv("AWS_PROFILE")
@@ -380,7 +381,6 @@ func TestUploadInvalidBucketBadName(t *testing.T) {
 // Test 3 - Negative Upload Testing
 //	Upload a file that does not exist
 func TestUploadInvalidFile(t *testing.T) {
-	expectedErrString := "The system cannot find the file specified"
 
 	testUploadInvalidPathObject := UploadObject{
 		PathToFile: "../this/should/../definitely/../../notexist",
@@ -392,7 +392,7 @@ func TestUploadInvalidFile(t *testing.T) {
 	}
 
 	_, err := UploadFile(svc, testUploadInvalidPathObject, policy, time.Now(), false, false)
-	if err != nil && strings.Contains(err.Error(), expectedErrString) {
+	if err != nil {
 		// Pass
 	} else {
 		t.Error("expected upload to fail with system unable to find specified file")

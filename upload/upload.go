@@ -31,7 +31,7 @@ func UploadFile(svc *s3.S3, uploadObject UploadObject, policy rpolicy.RotationPo
 		return "", err
 	}
 
-	fmt.Println(`
+	log.Info.Println(`
 	######################################
 	#         File Upload Started        #
 	######################################

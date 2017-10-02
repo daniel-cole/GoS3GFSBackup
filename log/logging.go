@@ -6,16 +6,14 @@ import (
 )
 
 var (
-	Info    *log.Logger
-	Warn 	*log.Logger
-	Error   *log.Logger
-)
+	Info   *log.Logger
+	Warn   *log.Logger
+	Error  *log.Logger)
 
 func Init(
 	infoHandle io.Writer,
 	warningHandle io.Writer,
-	errorHandle io.Writer) {
-
+	errorHandle io.Writer,) {
 
 	Info = log.New(infoHandle,
 		"INFO: ",

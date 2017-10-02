@@ -8,6 +8,8 @@ The implementation uploads backups to S3 in the following way:
 2. A weekly backup is taken every Monday (unless it's a monthly backup) with the prefix 'weekly_'. The maximum number of weekly backups kept by default is 4. When another weekly backup is created, the oldest weekly backup is rotated.
 3. A daily backup is taken once a day (unless it's a monthly or weekly backup) with the prefix 'daily_'. The maximum number of daily backups kept by default is 6. This ensures that 7 daily backups are kept as a weekly backup taken on Monday.
 
+Note that only backups in the root of the bucket will be rotated.
+
 ## CLI Arguments
 ./GoS3GFSBackup -h
 ```
