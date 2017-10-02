@@ -14,23 +14,23 @@ import (
 )
 
 type args struct {
-	CredFile               string `arg:"required,help:The full path to the AWS CLI credential file"`
 	Region                 string `arg:"required,help:The AWS region to upload the specified file to"`
 	Bucket                 string `arg:"required,help:The S3 bucket to upload the specified file to"`
+	CredFile               string `arg:"help:The full path to the AWS CLI credential file if environment variables are not being used to provide the access id and key"`
+	Profile                string `arg:"help:The profile to use for the AWS CLI credential file"`
+	PathToFile             string `arg:"help:The full path to the file to upload to the specified S3 bucket. Must be specified unless --rotateonly=true"`
+	S3FileName             string `arg:"help:The name of the file as it should appear in the S3 bucket. Must be specified unless --rotateonly=true"`
 	BucketDir              string `arg:"help:The directory in the bucket in which to upload the S3 object to. Must include the trailing slash"`
-	PathToFile             string `arg:"help:The full path to the file to upload to the specified S3 bucket. Must be specified unless --rotateOnly=true"`
-	S3FileName             string `arg:"help:The name of the file as it should appear in the S3 bucket. Must be specified unless --rotateOnly=true"`
-	Timeout                int    `arg:"help:The timeout to upload the specified file (seconds). Defaults to 3600 (1 hour)"`
-	Profile                string `arg:"help:The profile to use for the AWS CLI credential file. If none specified the default value will be used"`
-	JustUploadIt           bool   `arg:"help:If this option is specified the file will be uploaded as is without the GFS backup strategy"`
-	RotateOnly             bool   `arg:"help:If enabled then only GFS rotation will occur with no file upload. This is disabled by default"`
-	DryRun                 bool   `arg:"help:If enabled then no upload or rotation actions will be executed. Defaults to false"`
-	ConcurrentWorkers      int    `arg:"help:The number of threads to use when uploading the file to S3. Defaults to 5"`
-	EnforceRetentionPeriod bool   `arg:"help:If enabled then objects in the S3 bucket will only be rotated if they are older then the retention period. Enabled by default"`
-	DailyRetentionCount    int    `arg:"help:The number of daily objects to keep in S3. Defaults to 6"`
-	DailyRetentionPeriod   int    `arg:"help:The retention period (hours) that a daily object should be kept in S3. Defaults to 168 (7 days)"`
-	WeeklyRetentionCount   int    `arg:"help:The number of weekly objects to keep in S3. Defaults to 4"`
-	WeeklyRetentionPeriod  int    `arg:"help:The retention period (hours) that a weekly object should be kept in S3. Defaults to 672 (28 days)"`
+	Timeout                int    `arg:"help:The timeout to upload the specified file (seconds)"`
+	JustUploadIt           bool   `arg:"help:If this option is specified the file will be uploaded as is without the GFS backup strategy [default: false]"`
+	RotateOnly             bool   `arg:"help:If enabled then only GFS rotation will occur with no file upload [default: false]"`
+	DryRun                 bool   `arg:"help:If enabled then no upload or rotation actions will be executed [default: false]"`
+	ConcurrentWorkers      int    `arg:"help:The number of threads to use when uploading the file to S3"`
+	EnforceRetentionPeriod bool   `arg:"help:If enabled then objects in the S3 bucket will only be rotated if they are older then the retention period"`
+	DailyRetentionCount    int    `arg:"help:The number of daily objects to keep in S3"`
+	DailyRetentionPeriod   int    `arg:"help:The retention period (hours) that a daily object should be kept in S3"`
+	WeeklyRetentionCount   int    `arg:"help:The number of weekly objects to keep in S3"`
+	WeeklyRetentionPeriod  int    `arg:"help:The retention period (hours) that a weekly object should be kept in S3"`
 }
 
 func init() {
@@ -41,6 +41,7 @@ func main() {
 	// Set default args
 	args := args{}
 	args.Timeout = 3600 // Default timeout to 1 hour for file upload
+	args.CredFile = ""
 	args.Profile = "default"
 	args.BucketDir = ""
 	args.EnforceRetentionPeriod = true
