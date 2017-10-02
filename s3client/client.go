@@ -21,15 +21,13 @@ func CreateS3Client(credFile string, profile string, region string) (*s3.S3, err
 
 	var creds *credentials.Credentials
 
-	log.Info.Println("")
-
 	if accessKey == "" && secretAccessKey == "" {
 		// Missing both of the required environment variables
 		log.Info.Println("Environment variables missing to create client: 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY'")
 	} else if accessKey == "" {
-		log.Info.Println("Environment variables missing: 'AWS_ACCESS_KEY_ID'")
+		log.Info.Println("Environment variable missing: 'AWS_ACCESS_KEY_ID'")
 	} else if secretAccessKey == "" {
-		log.Info.Println("Environment variables missing: 'AWS_SECRET_ACCESS_KEY'")
+		log.Info.Println("Environment variable missing: 'AWS_SECRET_ACCESS_KEY'")
 
 	} else {
 		log.Info.Println("Loaded AWS credentials from environment variables")

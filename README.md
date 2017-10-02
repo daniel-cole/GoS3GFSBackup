@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/daniel-cole/GoS3GFSBackup.svg?branch=master)](https://travis-ci.org/daniel-cole/GoS3GFSBackup)
+
 # GoS3GFSBackup
 This is a custom take on the GFS backup strategy adopted for AWS S3 which is intended to be run on a daily basis to backup objects in S3.
 
@@ -8,7 +10,7 @@ The implementation uploads backups to S3 in the following way:
 
 ## CLI Arguments
 ./GoS3GFSBackup -h
-```sh
+```
 Options:
   --region  (required)      The AWS region to upload the specified file to
   --bucket  (required)      The S3 bucket to upload the specified file to
@@ -60,7 +62,7 @@ Options:
 ```
 
 If you prefer, you may set environment variables instead of using a credential file:
-```sh
+```
 AWS_ACCESS_KEY_ID=<access key id>
 AWS_SECRET_ACCESS_KEY=<secret access key>
 ```
@@ -81,10 +83,24 @@ AWS_SECRET_ACCESS_KEY=<secret access key>
 
 Run test suite with `go test -v ./...` in base directory of repository. Testing requires the following environment variables to be set:
 
-```sh
-AWS_REGION=<AWS Region>
-AWS_PROFILE=<AWS Profile>
-AWS_BUCKET=<AWS Bucket>
+
+If you're providing credentials via file:
+```
 AWS_CRED_FILE=<Path to AWS credential file>
-AWS_FORBIDDEN_BUCKET=<AWS bucket that user running tests does not have permission to access>
+AWS_PROFILE=<AWS profile>
+AWS_REGION=<AWS region where the buckets for testing exist>
+AWS_BUCKET_UPLOAD=<AWS bucket specifically for upload testing>
+AWS_BUCKET_ROTATION=<AWS bucket specifically for rotation testing>
+AWS_BUCKET_FORBIDDEN=<AWS bucket that user running tests does not have permission to access>
+```
+
+If you're providing credentials via env:
+
+```
+AWS_ACCESS_KEY_ID=<AWS access key ID>
+AWS_SECRET_ACCESS_KEY=<AWS secret access key>
+AWS_REGION=<AWS region where the buckets for testing exist>
+AWS_BUCKET_UPLOAD=<AWS bucket specifically for upload testing>
+AWS_BUCKET_ROTATION=<AWS bucket specifically for rotation testing>
+AWS_BUCKET_FORBIDDEN=<AWS bucket that user running tests does not have permission to access>
 ```

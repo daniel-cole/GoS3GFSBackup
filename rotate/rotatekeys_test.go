@@ -37,7 +37,7 @@ func init() {
 	aws_credentials := os.Getenv("AWS_CRED_FILE")
 	aws_profile := os.Getenv("AWS_PROFILE")
 	aws_region := os.Getenv("AWS_REGION")
-	aws_bucket := os.Getenv("AWS_BUCKET")
+	aws_bucket := os.Getenv("AWS_BUCKET_ROTATION")
 	s3svc, err := s3client.CreateS3Client(aws_credentials, aws_profile, aws_region)
 
 	if err != nil {
@@ -1113,7 +1113,7 @@ func TestRotationWithOtherObjects(t *testing.T) {
 	}
 
 	for _, randomKey := range randomKeys {
-		if !util.FindKeyInBucket(randomKey, bucketContents){
+		if !util.FindKeyInBucket(randomKey, bucketContents) {
 			t.Error("expected to find key in bucket: " + randomKey)
 		}
 	}
@@ -1141,6 +1141,12 @@ func runMockBackup(t *testing.T, uploadDate time.Time, delay int, providedPolicy
 	s3FileName, err := upload.UploadFile(svc, testUploadObject, providedPolicy, uploadDate, false, dryRun)
 	if err != nil {
 		t.Fatal(fmt.Sprintf("failed to upload file: %v", err))
+	}
+
+	// If no minimum delay is specified then it's more likely a file will be uploaded
+	// out of order and break the test
+	if delay == 0 {
+		delay = 1
 	}
 
 	time.Sleep(time.Second * time.Duration(delay))

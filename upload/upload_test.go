@@ -45,8 +45,8 @@ func init() {
 	aws_credentials := os.Getenv("AWS_CRED_FILE")
 	aws_profile := os.Getenv("AWS_PROFILE")
 	aws_region := os.Getenv("AWS_REGION")
-	aws_bucket := os.Getenv("AWS_BUCKET")
-	aws_forbidden_bucket = os.Getenv("AWS_FORBIDDEN_BUCKET")
+	aws_bucket := os.Getenv("AWS_BUCKET_UPLOAD")
+	aws_forbidden_bucket = os.Getenv("AWS_BUCKET_FORBIDDEN")
 
 	s3svc, err := s3client.CreateS3Client(aws_credentials, aws_profile, aws_region)
 	if err != nil {
@@ -85,8 +85,8 @@ func init() {
 		os.Exit(1)
 	}
 
-	bigFileSize = int64(250 * 1024 * 1024) // 250MiB
-	bigS3FileName = "bigS3File250MB"
+	bigFileSize = int64(1000 * 1024 * 1024) // 1GiB
+	bigS3FileName = "bigS3File"
 	pathToBigFile = "../" + bigS3FileName
 
 	bigTestUploadObject = UploadObject{
@@ -352,7 +352,7 @@ func TestUploadInvalidBucketNotSpecified(t *testing.T) {
 	if err != nil && strings.Contains(err.Error(), expectedErrString) {
 		// Pass
 	} else {
-		t.Error("expected upload to fail with system unable to find specified file")
+		t.Error("expected upload to fail with system unable to find specified file, isntead got: " + err.Error())
 	}
 }
 
@@ -417,7 +417,7 @@ func TestUploadForbiddenBucket(t *testing.T) {
 	if err != nil && strings.Contains(err.Error(), expectedErrString) {
 		// Pass
 	} else {
-		t.Error("expected upload to fail with status code 403")
+		t.Error("expected upload to fail with status code 403, instead got: " + err.Error())
 	}
 }
 
@@ -430,7 +430,7 @@ func TestUploadExceedTimeout(t *testing.T) {
 		S3FileName: bigS3FileName,
 		BucketDir:  "",
 		Bucket:     bucket,
-		Timeout:    time.Second * 60,
+		Timeout:    time.Second * 10,
 		NumWorkers: 5,
 	}
 
