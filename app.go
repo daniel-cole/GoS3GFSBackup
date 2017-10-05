@@ -1,15 +1,15 @@
 package main
 
 import (
-	"os"
-	"time"
 	"github.com/alexflint/go-arg"
-	"github.com/daniel-cole/GoS3GFSBackup/rpolicy"
-	"github.com/daniel-cole/GoS3GFSBackup/s3client"
 	"github.com/daniel-cole/GoS3GFSBackup/log"
 	"github.com/daniel-cole/GoS3GFSBackup/rotate"
+	"github.com/daniel-cole/GoS3GFSBackup/rpolicy"
+	"github.com/daniel-cole/GoS3GFSBackup/s3client"
 	"github.com/daniel-cole/GoS3GFSBackup/upload"
+	"os"
 	"strconv"
+	"time"
 )
 
 type args struct {

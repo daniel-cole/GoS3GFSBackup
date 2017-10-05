@@ -1,18 +1,18 @@
 package upload
 
 import (
-	"os"
 	"fmt"
-	"time"
-	"testing"
-	"strconv"
-	"strings"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/daniel-cole/GoS3GFSBackup/log"
 	"github.com/daniel-cole/GoS3GFSBackup/rpolicy"
-	"github.com/daniel-cole/GoS3GFSBackup/util"
 	"github.com/daniel-cole/GoS3GFSBackup/s3client"
+	"github.com/daniel-cole/GoS3GFSBackup/util"
 	"io/ioutil"
+	"os"
+	"strconv"
+	"strings"
+	"testing"
+	"time"
 )
 
 // Test variables
@@ -37,19 +37,19 @@ var pathToBigFile string
 var bigFileSize int64
 var bigTestUploadObject UploadObject
 
-var aws_forbidden_bucket string
+var awsForbiddenBucket string
 
 // Setup testing
 func init() {
 	log.Init(ioutil.Discard, ioutil.Discard, ioutil.Discard)
 
-	aws_credentials := os.Getenv("AWS_CRED_FILE")
-	aws_profile := os.Getenv("AWS_PROFILE")
-	aws_region := os.Getenv("AWS_REGION")
-	aws_bucket := os.Getenv("AWS_BUCKET_UPLOAD")
-	aws_forbidden_bucket = os.Getenv("AWS_BUCKET_FORBIDDEN")
+	awsCredentials := os.Getenv("AWS_CRED_FILE")
+	awsProfile := os.Getenv("AWS_PROFILE")
+	awsRegion := os.Getenv("AWS_REGION")
+	awsBucket := os.Getenv("AWS_BUCKET_UPLOAD")
+	awsForbiddenBucket = os.Getenv("AWS_BUCKET_FORBIDDEN")
 
-	s3svc, err := s3client.CreateS3Client(aws_credentials, aws_profile, aws_region)
+	s3svc, err := s3client.CreateS3Client(awsCredentials, awsProfile, awsRegion)
 	if err != nil {
 		log.Error.Println(err)
 		os.Exit(1)
@@ -57,7 +57,7 @@ func init() {
 
 	svc = s3svc
 
-	bucket = aws_bucket
+	bucket = awsBucket
 
 	dailyRetentionCount = 6
 	dailyRetentionPeriod = 140
@@ -232,7 +232,7 @@ func TestUpload50Files(t *testing.T) {
 	}
 
 	for _, bucketKey := range bucketKeys {
-		if !util.FindKeyInBucket(bucketKey, bucketContents){
+		if !util.FindKeyInBucket(bucketKey, bucketContents) {
 			t.Error("expected to find key in bucket: " + bucketKey)
 		}
 	}
@@ -260,7 +260,7 @@ func TestUpload250MBFile(t *testing.T) {
 		t.Error("expected bucket size to be 1")
 	}
 
-	if !util.FindKeyInBucket(bucketKey, bucketContents){
+	if !util.FindKeyInBucket(bucketKey, bucketContents) {
 		t.Error("expected to find key in bucket: " + bucketKey)
 	}
 }
@@ -290,7 +290,7 @@ func TestUploadWithDryRun(t *testing.T) {
 
 // Test 6 - Positive Upload Testing
 //	Upload a file with bucket dir specified
-func TestUploadBucketDir(t *testing.T){
+func TestUploadBucketDir(t *testing.T) {
 	err := util.EmptyBucket(svc, bucket)
 	if err != nil {
 		t.Error("failed to empty bucket")
@@ -316,12 +316,12 @@ func TestUploadBucketDir(t *testing.T){
 		t.Error("expected bucket size to be 1")
 	}
 
-	if !util.FindKeyInBucket(bucketKey, bucketContents){
+	if !util.FindKeyInBucket(bucketKey, bucketContents) {
 		t.Error("expected to find key in bucket: " + bucketKey)
 	}
 }
 
-func TestJustUploadItWithBucket(t *testing.T){
+func TestJustUploadItWithBucket(t *testing.T) {
 
 }
 
@@ -408,7 +408,7 @@ func TestUploadForbiddenBucket(t *testing.T) {
 		PathToFile: pathToTestFile,
 		S3FileName: s3FileName,
 		BucketDir:  "",
-		Bucket:     aws_forbidden_bucket,
+		Bucket:     awsForbiddenBucket,
 		Timeout:    timeout,
 		NumWorkers: 5,
 	}
@@ -444,7 +444,7 @@ func TestUploadExceedTimeout(t *testing.T) {
 
 // Test 6 - Negative Upload Testing
 //	Upload a file with an invalid bucket directory
-func TestUploadInvalidBucketDir(t *testing.T){
+func TestUploadInvalidBucketDir(t *testing.T) {
 	expectedErrString := "expected bucket dir to have trailing slash"
 
 	testUploadBadObject := UploadObject{
@@ -467,7 +467,7 @@ func TestUploadInvalidBucketDir(t *testing.T){
 // Test 7 - Negative Upload Testing
 //	Upload a file with negative workers
 
-func TestUploadInvalidWorkers(t *testing.T){
+func TestUploadInvalidWorkers(t *testing.T) {
 	expectedErrString := "concurrent workers should not be less than 1"
 
 	testUploadBadObject := UploadObject{
@@ -489,7 +489,7 @@ func TestUploadInvalidWorkers(t *testing.T){
 
 // Test 8 - Negative Upload Testing
 //	Upload a file with no path specified
-func TestUploadNoPathToFile(t *testing.T){
+func TestUploadNoPathToFile(t *testing.T) {
 	expectedErrString := "path to file should not be empty and must include the full path to the file"
 
 	testUploadBadObject := UploadObject{
@@ -511,7 +511,7 @@ func TestUploadNoPathToFile(t *testing.T){
 
 // Test 9 - Negative Upload Testing
 //	Upload a file with negative timeout
-func TestUploadNegativeTimeout(t *testing.T){
+func TestUploadNegativeTimeout(t *testing.T) {
 	expectedErrString := "timeout must not be less than 0"
 
 	testUploadBadObject := UploadObject{

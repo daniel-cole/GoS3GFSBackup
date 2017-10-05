@@ -1,18 +1,18 @@
 package rotate
 
 import (
-	"os"
 	"fmt"
-	"time"
-	"testing"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/daniel-cole/GoS3GFSBackup/log"
 	"github.com/daniel-cole/GoS3GFSBackup/rpolicy"
 	"github.com/daniel-cole/GoS3GFSBackup/s3client"
 	"github.com/daniel-cole/GoS3GFSBackup/upload"
-	"github.com/daniel-cole/GoS3GFSBackup/log"
 	"github.com/daniel-cole/GoS3GFSBackup/util"
-	"strconv"
 	"io/ioutil"
+	"os"
+	"strconv"
+	"testing"
+	"time"
 )
 
 // Test variables
@@ -35,11 +35,11 @@ var pathToTestFile string
 func init() {
 	log.Init(ioutil.Discard, ioutil.Discard, ioutil.Discard)
 
-	aws_credentials := os.Getenv("AWS_CRED_FILE")
-	aws_profile := os.Getenv("AWS_PROFILE")
-	aws_region := os.Getenv("AWS_REGION")
-	aws_bucket := os.Getenv("AWS_BUCKET_ROTATION")
-	s3svc, err := s3client.CreateS3Client(aws_credentials, aws_profile, aws_region)
+	awsCredentials := os.Getenv("AWS_CRED_FILE")
+	awsProfile := os.Getenv("AWS_PROFILE")
+	awsRegion := os.Getenv("AWS_REGION")
+	awsBucket := os.Getenv("AWS_BUCKET_ROTATION")
+	s3svc, err := s3client.CreateS3Client(awsCredentials, awsProfile, awsRegion)
 
 	if err != nil {
 		log.Error.Println(err)
@@ -48,7 +48,7 @@ func init() {
 
 	svc = s3svc
 
-	bucket = aws_bucket
+	bucket = awsBucket
 
 	dailyRetentionCount = 6
 	dailyRetentionPeriod = 140

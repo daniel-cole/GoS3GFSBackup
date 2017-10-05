@@ -1,19 +1,26 @@
 package log
 
 import (
-	"log"
 	"io"
+	"log"
 )
 
 var (
-	Info   *log.Logger
-	Warn   *log.Logger
-	Error  *log.Logger)
+	// Info Logger
+	Info *log.Logger
 
+	// Warning Logger
+	Warn *log.Logger
+
+	// Error Logger
+	Error *log.Logger
+)
+
+// Initialises the the logger
 func Init(
 	infoHandle io.Writer,
 	warningHandle io.Writer,
-	errorHandle io.Writer,) {
+	errorHandle io.Writer) {
 
 	Info = log.New(infoHandle,
 		"INFO: ",

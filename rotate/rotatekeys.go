@@ -1,14 +1,15 @@
 package rotate
 
 import (
-	"time"
-	"github.com/daniel-cole/GoS3GFSBackup/log"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/daniel-cole/GoS3GFSBackup/s3client"
+	"github.com/daniel-cole/GoS3GFSBackup/log"
 	"github.com/daniel-cole/GoS3GFSBackup/rpolicy"
+	"github.com/daniel-cole/GoS3GFSBackup/s3client"
 	"github.com/daniel-cole/GoS3GFSBackup/util"
+	"time"
 )
 
+// StartRotation initiates the GFS rotation with the provided policy
 func StartRotation(svc *s3.S3, bucket string, policy rpolicy.RotationPolicy, dryRun bool) []string {
 	log.Info.Println(`
 	######################################
@@ -116,7 +117,7 @@ func keyRotation(svc *s3.S3, bucket string, retentionPeriod time.Duration, reten
 					keyAgeMinutes, retentionPeriod.Hours(), retentionPeriod.Minutes())
 			}
 			if dryRun { // Do not delete any keys if dry run has been specified
-				log.Info.Printf("Skipping deletion of key: '%s' as dry run has been enabled")
+				log.Info.Printf("Skipping deletion of key: '%s' as dry run has been enabled\n", key)
 				deletedKeys = append(deletedKeys, key)
 			} else {
 				deletedKey, err := s3client.DeleteKey(svc, bucket, key)

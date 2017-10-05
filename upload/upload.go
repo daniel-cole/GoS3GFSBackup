@@ -1,24 +1,24 @@
 package upload
 
 import (
-	"os"
-	"fmt"
-	"time"
 	"context"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/daniel-cole/GoS3GFSBackup/log"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/daniel-cole/GoS3GFSBackup/rpolicy"
-	"github.com/daniel-cole/GoS3GFSBackup/util"
-	"github.com/daniel-cole/GoS3GFSBackup/s3client"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"math"
-	"strings"
 	"errors"
+	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/daniel-cole/GoS3GFSBackup/log"
+	"github.com/daniel-cole/GoS3GFSBackup/rpolicy"
+	"github.com/daniel-cole/GoS3GFSBackup/s3client"
+	"github.com/daniel-cole/GoS3GFSBackup/util"
+	"math"
+	"os"
 	"regexp"
+	"strings"
+	"time"
 )
 
-// Returns the name of the file that was uploaded to S3
+// UploadFile returns the name of the file that was uploaded to S3
 func UploadFile(svc *s3.S3, uploadObject UploadObject, policy rpolicy.RotationPolicy,
 	uploadTime time.Time, justUploadIt bool, dryRun bool) (string, error) {
 
@@ -145,7 +145,7 @@ func checkUploadProgress(svc *s3.S3, s3FileName string, bucket string, partSize 
 				log.Warn.Printf("Failed to retrieve upload id: %v\n", err)
 			}
 
-			partsCompleted, err := s3client.GetNumMultiPartsById(svc, bucket, s3FileName, uploadId)
+			partsCompleted, err := s3client.GetCountMultiPartsById(svc, bucket, s3FileName, uploadId)
 			if err != nil {
 				log.Warn.Printf("Failed to retrieve uploaded parts: %v\n", err)
 			}
