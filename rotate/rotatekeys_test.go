@@ -533,7 +533,7 @@ func TestFullNinetyDaysUpload(t *testing.T) {
 	mostRecentDailyBackups := []string{}
 	mostRecentWeeklyBackups := []string{}
 
-	for currentDay := SEP_02; currentDay <= NOV_30; currentDay++ {
+	for currentDay = SEP_02; currentDay <= NOV_30; currentDay++ {
 		uploadDate = uploadDate.Add(time.Hour * 24)
 		backupKey, _ := runMockBackup(t, uploadDate, 0, policy, false)
 
@@ -1067,7 +1067,7 @@ func TestRotationWithOtherObjects(t *testing.T) {
 	mostRecentDailyBackups := []string{}
 	mostRecentWeeklyBackups := []string{}
 
-	for currentDay := SEP_02; currentDay <= NOV_30; currentDay++ {
+	for currentDay = SEP_02; currentDay <= NOV_30; currentDay++ {
 		uploadDate = uploadDate.Add(time.Hour * 24)
 		backupKey, _ := runMockBackup(t, uploadDate, 0, policy, false)
 

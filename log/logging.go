@@ -9,7 +9,7 @@ var (
 	// Info Logger
 	Info *log.Logger
 
-	// Warning Logger
+	// Warn Logger
 	Warn *log.Logger
 
 	// Error Logger

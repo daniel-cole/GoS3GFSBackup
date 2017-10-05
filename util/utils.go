@@ -86,7 +86,6 @@ func FindKeysInBucketByPrefix(prefix string, bucketContents *s3.ListObjectsOutpu
 	return keys
 }
 
-
 // EmptyBucket simply deletes all the objects in the specified bucket
 func EmptyBucket(svc *s3.S3, bucket string) error {
 	result, err := s3client.GetBucketContents(svc, bucket)
