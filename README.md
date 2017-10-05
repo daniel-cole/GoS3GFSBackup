@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/daniel-cole/GoS3GFSBackup.svg?branch=master)](https://travis-ci.org/daniel-cole/GoS3GFSBackup)
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/daniel-cole/GoS3GFSBackup)](https://goreportcard.com/report/github.com/daniel-cole/GoS3GFSBackup)
 # GoS3GFSBackup
 This is a custom take on the GFS backup strategy adopted for AWS S3 which is intended to be run on a daily basis to backup objects in S3.
 
