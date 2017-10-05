@@ -1137,9 +1137,12 @@ func runMockBackup(t *testing.T, uploadDate time.Time, delay int, providedPolicy
 		Bucket:     bucket,
 		Timeout:    timeout,
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: true,
 	}
 
-	s3FileName, err := upload.UploadFile(svc, testUploadObject, providedPolicy, uploadDate, false, dryRun)
+	prefix := util.GetKeyType(providedPolicy, uploadDate)
+	s3FileName, err := upload.UploadFile(svc, testUploadObject, prefix, dryRun)
 	if err != nil {
 		t.Fatal(fmt.Sprintf("failed to upload file: %v", err))
 	}
@@ -1163,9 +1166,12 @@ func justUploadIt(s3FileName string, s3BucketDir string) (string, error) {
 		Bucket:     bucket,
 		Timeout:    timeout,
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: false,
 	}
 
-	backupKey, err := upload.UploadFile(svc, testUploadObject, policy, time.Now(), true, false)
+	prefix := util.GetKeyType(policy, time.Now())
+	backupKey, err := upload.UploadFile(svc, testUploadObject, prefix, false)
 	if err != nil {
 		return "", err
 	}

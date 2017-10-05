@@ -30,7 +30,8 @@ var weeklyRetentionPeriod time.Duration
 
 var testFileName string
 var pathToTestFile string
-var testUploadObject UploadObject
+var testUploadObjectManipulated UploadObject
+var testUploadObjectNotManipulated UploadObject
 
 var bigS3FileName string
 var pathToBigFile string
@@ -71,13 +72,26 @@ func init() {
 	testFileName = "testBackupFile"
 	pathToTestFile = "../" + testFileName
 
-	testUploadObject = UploadObject{
+	testUploadObjectManipulated = UploadObject{
 		PathToFile: pathToTestFile,
 		S3FileName: s3FileName,
 		BucketDir:  "",
 		Bucket:     bucket,
 		Timeout:    timeout,
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: true,
+	}
+
+	testUploadObjectNotManipulated = UploadObject{
+		PathToFile: pathToTestFile,
+		S3FileName: s3FileName,
+		BucketDir:  "",
+		Bucket:     bucket,
+		Timeout:    timeout,
+		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: false,
 	}
 
 	err = util.CreateFile(pathToTestFile, []byte("this is just a little test file"))
@@ -97,6 +111,8 @@ func init() {
 		Bucket:     bucket,
 		Timeout:    timeout,
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: true,
 	}
 
 	err = util.CreateBigFile(pathToBigFile, bigFileSize)
@@ -146,7 +162,8 @@ func TestUploadSingleFile(t *testing.T) {
 		t.Error("failed to empty bucket")
 	}
 
-	s3FileName, err := UploadFile(svc, testUploadObject, policy, time.Now(), false, false)
+	prefix := util.GetKeyType(policy, time.Now())
+	s3FileName, err := UploadFile(svc, testUploadObjectManipulated, prefix, false)
 	if err != nil {
 		t.Error(fmt.Sprintf("expected to upload single file without any error: %v", err))
 	}
@@ -167,14 +184,15 @@ func TestUploadSingleFile(t *testing.T) {
 }
 
 // Test 2 - Positive Upload Testing
-//	Upload a single file with justUploadIt set to true
+//	Upload a single file with manipulation set to false
 func TestJustUploadIt(t *testing.T) {
 	err := util.EmptyBucket(svc, bucket)
 	if err != nil {
 		t.Error("failed to empty bucket")
 	}
 
-	_, err = UploadFile(svc, testUploadObject, policy, time.Now(), true, false) // Set justUploadIt to true
+	prefix := util.GetKeyType(policy, time.Now())
+	_, err = UploadFile(svc, testUploadObjectNotManipulated, prefix, false) // Set justUploadIt to true
 	if err != nil {
 		t.Error("expected to upload single file without any error")
 	}
@@ -208,13 +226,17 @@ func TestUpload50Files(t *testing.T) {
 		Bucket:     bucket,
 		Timeout:    timeout,
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: true,
 	}
 
 	bucketKeys := []string{}
 
 	for i := 0; i < 50; i++ {
 		testUploadMultipleObject.S3FileName = s3FileName + strconv.Itoa(i)
-		bucketKey, err := UploadFile(svc, testUploadMultipleObject, policy, time.Now(), false, false)
+
+		prefix := util.GetKeyType(policy, time.Now())
+		bucketKey, err := UploadFile(svc, testUploadMultipleObject, prefix, false)
 		if err != nil {
 			t.Error(fmt.Sprintf("expected to successfully upload file '%d' in bulk upload of 50 files", i))
 		}
@@ -246,7 +268,8 @@ func TestUpload250MBFile(t *testing.T) {
 		t.Error("failed to empty bucket")
 	}
 
-	bucketKey, err := UploadFile(svc, bigTestUploadObject, policy, time.Now(), false, false)
+	prefix := util.GetKeyType(policy, time.Now())
+	bucketKey, err := UploadFile(svc, bigTestUploadObject, prefix, false)
 	if err != nil {
 		t.Error(fmt.Sprintf("failed to upload big file of size: %v bytes", bigFileSize))
 	}
@@ -273,7 +296,8 @@ func TestUploadWithDryRun(t *testing.T) {
 		t.Error("failed to empty bucket")
 	}
 
-	_, err = UploadFile(svc, testUploadObject, policy, time.Now(), false, true)
+	prefix := util.GetKeyType(policy, time.Now())
+	_, err = UploadFile(svc, testUploadObjectManipulated, prefix, true)
 	if err != nil {
 		t.Error(fmt.Sprintf("failed to upload big file of size: %v bytes", bigFileSize))
 	}
@@ -303,9 +327,12 @@ func TestUploadBucketDir(t *testing.T) {
 		Bucket:     bucket,
 		Timeout:    timeout,
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: true,
 	}
 
-	bucketKey, err := UploadFile(svc, testUploadBucketDirObject, policy, time.Now(), false, false)
+	prefix := util.GetKeyType(policy, time.Now())
+	bucketKey, err := UploadFile(svc, testUploadBucketDirObject, prefix, false)
 
 	bucketContents, err := s3client.GetBucketContents(svc, bucket)
 	if err != nil {
@@ -347,9 +374,12 @@ func TestUploadInvalidBucketNotSpecified(t *testing.T) {
 		Bucket:     "",
 		Timeout:    timeout,
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: true,
 	}
 
-	_, err := UploadFile(svc, testUploadNoBucketObject, policy, time.Now(), false, false)
+	prefix := util.GetKeyType(policy, time.Now())
+	_, err := UploadFile(svc, testUploadNoBucketObject, prefix, false)
 	if err != nil && strings.Contains(err.Error(), expectedErrString) {
 		// Pass
 	} else {
@@ -369,8 +399,12 @@ func TestUploadInvalidBucketBadName(t *testing.T) {
 		Bucket:     "badbucket*?",
 		Timeout:    timeout,
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: true,
 	}
-	_, err := UploadFile(svc, testUploadInvalidBucketObject, policy, time.Now(), false, false)
+
+	prefix := util.GetKeyType(policy, time.Now())
+	_, err := UploadFile(svc, testUploadInvalidBucketObject, prefix, false)
 	if err != nil && strings.Contains(err.Error(), expectedErrString) {
 		// Pass
 	} else {
@@ -389,9 +423,12 @@ func TestUploadInvalidFile(t *testing.T) {
 		Bucket:     bucket,
 		Timeout:    timeout,
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: true,
 	}
 
-	_, err := UploadFile(svc, testUploadInvalidPathObject, policy, time.Now(), false, false)
+	prefix := util.GetKeyType(policy, time.Now())
+	_, err := UploadFile(svc, testUploadInvalidPathObject, prefix, false)
 	if err != nil {
 		// Pass
 	} else {
@@ -411,9 +448,12 @@ func TestUploadForbiddenBucket(t *testing.T) {
 		Bucket:     awsForbiddenBucket,
 		Timeout:    timeout,
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: true,
 	}
 
-	_, err := UploadFile(svc, testUploadBadPermissionObject, policy, time.Now(), false, false)
+	prefix := util.GetKeyType(policy, time.Now())
+	_, err := UploadFile(svc, testUploadBadPermissionObject, prefix, false)
 	if err != nil && strings.Contains(err.Error(), expectedErrString) {
 		// Pass
 	} else {
@@ -432,9 +472,12 @@ func TestUploadExceedTimeout(t *testing.T) {
 		Bucket:     bucket,
 		Timeout:    time.Second * 10,
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: true,
 	}
 
-	_, err := UploadFile(svc, testUploadTimeoutObject, policy, time.Now(), false, false)
+	prefix := util.GetKeyType(policy, time.Now())
+	_, err := UploadFile(svc, testUploadTimeoutObject, prefix, false)
 
 	if err == nil && !strings.Contains(err.Error(), "context deadline exceeded") {
 		t.Error(fmt.Sprintf("expected file upload to timeout. timeout specified was: %d seconds", timeout))
@@ -454,9 +497,12 @@ func TestUploadInvalidBucketDir(t *testing.T) {
 		Bucket:     bucket,
 		Timeout:    timeout,
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: true,
 	}
 
-	_, err := UploadFile(svc, testUploadBadObject, policy, time.Now(), false, false)
+	prefix := util.GetKeyType(policy, time.Now())
+	_, err := UploadFile(svc, testUploadBadObject, prefix, false)
 	if err != nil && strings.Contains(err.Error(), expectedErrString) {
 		// Pass
 	} else {
@@ -477,9 +523,12 @@ func TestUploadInvalidWorkers(t *testing.T) {
 		Bucket:     bucket,
 		Timeout:    timeout,
 		NumWorkers: 0,
+		PartSize:   50,
+		Manipulate: true,
 	}
 
-	_, err := UploadFile(svc, testUploadBadObject, policy, time.Now(), false, false)
+	prefix := util.GetKeyType(policy, time.Now())
+	_, err := UploadFile(svc, testUploadBadObject, prefix, false)
 	if err != nil && strings.Contains(err.Error(), expectedErrString) {
 		// Pass
 	} else {
@@ -499,9 +548,12 @@ func TestUploadNoPathToFile(t *testing.T) {
 		Bucket:     bucket,
 		Timeout:    timeout,
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: true,
 	}
 
-	_, err := UploadFile(svc, testUploadBadObject, policy, time.Now(), false, false)
+	prefix := util.GetKeyType(policy, time.Now())
+	_, err := UploadFile(svc, testUploadBadObject, prefix, false)
 	if err != nil && strings.Contains(err.Error(), expectedErrString) {
 		// Pass
 	} else {
@@ -521,9 +573,12 @@ func TestUploadNegativeTimeout(t *testing.T) {
 		Bucket:     bucket,
 		Timeout:    time.Second * time.Duration(-1),
 		NumWorkers: 5,
+		PartSize:   50,
+		Manipulate: true,
 	}
 
-	_, err := UploadFile(svc, testUploadBadObject, policy, time.Now(), false, false)
+	prefix := util.GetKeyType(policy, time.Now())
+	_, err := UploadFile(svc, testUploadBadObject, prefix, false)
 	if err != nil && strings.Contains(err.Error(), expectedErrString) {
 		// Pass
 	} else {

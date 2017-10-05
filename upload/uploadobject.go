@@ -8,6 +8,8 @@ type UploadObject struct {
 	S3FileName string
 	Bucket     string
 	BucketDir  string
+	Manipulate bool
 	Timeout    time.Duration
 	NumWorkers int
+	PartSize   int
 }

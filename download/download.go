@@ -7,6 +7,7 @@ import (
 	//"io"
 )
 
+// DownloadFile downloads a file from s3 given a bucket and key
 func DownloadFile(svc *s3.S3, bucket string, key string) error {
 
 	//partSize := int64(50 * 1024 * 1024) // 50 MiB

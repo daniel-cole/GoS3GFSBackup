@@ -8,9 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/daniel-cole/GoS3GFSBackup/log"
-	"github.com/daniel-cole/GoS3GFSBackup/rpolicy"
 	"github.com/daniel-cole/GoS3GFSBackup/s3client"
-	"github.com/daniel-cole/GoS3GFSBackup/util"
 	"math"
 	"os"
 	"regexp"
@@ -19,8 +17,8 @@ import (
 )
 
 // UploadFile returns the name of the file that was uploaded to S3
-func UploadFile(svc *s3.S3, uploadObject UploadObject, policy rpolicy.RotationPolicy,
-	uploadTime time.Time, justUploadIt bool, dryRun bool) (string, error) {
+// If manipulate name is true then the file the prefix will be applied and timestamp appended to the S3 file name
+func UploadFile(svc *s3.S3, uploadObject UploadObject, prefix string, dryRun bool) (string, error) {
 
 	if svc == nil {
 		return "", errors.New("svc must not be nil")
@@ -58,11 +56,9 @@ func UploadFile(svc *s3.S3, uploadObject UploadObject, policy rpolicy.RotationPo
 
 	log.Info.Printf("Uploading '%s' (%d bytes) to s3 bucket '%s'\n", uploadObject.PathToFile, fileSize, uploadObject.Bucket)
 
-	prefix := util.GetKeyType(policy, uploadTime)
-
 	s3FileName := uploadObject.S3FileName
 
-	if !justUploadIt { // Mutate the file name to comply with GFS
+	if uploadObject.Manipulate { // Mutate the file name to comply with GFS
 		s3FileName = fmt.Sprintf("%s%s%s_%s", uploadObject.BucketDir, prefix, uploadObject.S3FileName, time.Now().Format("20060102T150405"))
 	} else {
 		s3FileName = uploadObject.BucketDir + s3FileName
@@ -74,7 +70,7 @@ func UploadFile(svc *s3.S3, uploadObject UploadObject, policy rpolicy.RotationPo
 		Body:   file,
 	}
 
-	partSize := int64(50 * 1024 * 1024) // 50 MiB
+	partSize := int64(uploadObject.PartSize * 1024 * 1024)
 
 	log.Info.Printf("Upload part size is: %d bytes\n", partSize)
 
@@ -182,6 +178,10 @@ func validationCheck(uploadObject UploadObject) error {
 
 	if uploadObject.Timeout < 0 {
 		return errors.New("timeout must not be less than 0")
+	}
+
+	if (uploadObject.PartSize * 1024 * 1024) < (1024 * 1024 * 5) { // 5MiB
+		return errors.New("upload object size must be greater than 5MiB")
 	}
 
 	return nil

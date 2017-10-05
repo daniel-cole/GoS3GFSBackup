@@ -10,8 +10,7 @@ import (
 	"os"
 )
 
-// CreateS3Client creates an S3 client using:
-// 1. Environment variables if present
+// CreateS3Client creates an S3 client using environment variables if present; else AWS creds file
 // 2. Use the specified credential file
 func CreateS3Client(credFile string, profile string, region string) (*s3.S3, error) {
 	accessKey := os.Getenv("AWS_ACCESS_KEY_ID")
