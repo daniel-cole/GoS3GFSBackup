@@ -1,12 +1,14 @@
 package util
 
 import (
+	"crypto/md5"
 	"errors"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/daniel-cole/GoS3GFSBackup/rpolicy"
 	"github.com/daniel-cole/GoS3GFSBackup/s3client"
 	"github.com/jinzhu/now"
+	"io"
 	"os"
 	"regexp"
 	"time"
@@ -155,4 +157,21 @@ func CreateFile(pathToFile string, contents []byte) error {
 		return err
 	}
 	return nil
+}
+
+// ComputeMD5Sum takes the full path of a file and returns the md5sum
+func ComputeMD5Sum(filePath string) ([]byte, error) {
+	var result []byte
+	file, err := os.Open(filePath)
+	if err != nil {
+		return result, err
+	}
+	defer file.Close()
+
+	hash := md5.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return result, err
+	}
+
+	return hash.Sum(result), nil
 }

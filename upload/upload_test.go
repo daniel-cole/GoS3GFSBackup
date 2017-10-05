@@ -97,7 +97,6 @@ func init() {
 	err = util.CreateFile(pathToTestFile, []byte("this is just a little test file"))
 	if err != nil {
 		log.Error.Println("failed to create file required for testing")
-		os.Exit(1)
 	}
 
 	bigFileSize = int64(1000 * 1024 * 1024) // 1GiB
@@ -118,7 +117,6 @@ func init() {
 	err = util.CreateBigFile(pathToBigFile, bigFileSize)
 	if err != nil {
 		log.Error.Println("failed to create file required for testing")
-		os.Exit(1)
 	}
 
 	// Not critical to run this up but can get costly if no lifecycle policy in place to clean up dead multiparts

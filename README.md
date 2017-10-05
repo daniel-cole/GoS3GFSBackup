@@ -8,24 +8,24 @@ The implementation uploads backups to S3 in the following way:
 2. A weekly backup is taken every Monday (unless it's a monthly backup) with the prefix 'weekly_'. The maximum number of weekly backups kept by default is 4. When another weekly backup is created, the oldest weekly backup is rotated.
 3. A daily backup is taken once a day (unless it's a monthly or weekly backup) with the prefix 'daily_'. The maximum number of daily backups kept by default is 6. This ensures that 7 daily backups are kept as a weekly backup taken on Monday.
 
-Note that only backups in the root of the bucket will be rotated.
+:warning: ONLY backups in the root of the bucket will be rotated. :warning:
 
 ## CLI Arguments
 ./GoS3GFSBackup -h
 ```
 Options:
-  --region  (required)      The AWS region to upload the specified file to
-  --bucket  (required)      The S3 bucket to upload the specified file to
+  --action   (required)     The intended action for the tool to run [backup|upload|download|rotate]
+  --region   (required)     The AWS region to upload the specified file to
+  --bucket   (required)     The S3 bucket to upload the specified file to
   --credfile                The full path to the AWS CLI credential file if environment variables are not being used to provide the access id and key
   --profile                 The profile to use for the AWS CLI credential file [default: default]
   --pathtofile              The full path to the file to upload to the specified S3 bucket. Must be specified unless --rotateonly=true
   --s3filename              The name of the file as it should appear in the S3 bucket. Must be specified unless --rotateonly=true
-  --bucketdir               The directory in the bucket in which to upload the S3 object to. Must include the trailing slash
+  --bucketdir               The directory chain in the bucket in which to upload the S3 object to. Must include the trailing slash
   --timeout                 The timeout to upload the specified file (seconds) [default: 3600]
-  --justuploadit            If this option is specified the file will be uploaded as is without the GFS backup strategy [default: false]
-  --rotateonly              If enabled then only GFS rotation will occur with no file upload [default: false]
   --dryrun                  If enabled then no upload or rotation actions will be executed [default: false]
   --concurrentworkers       The number of threads to use when uploading the file to S3 [default: 5]
+  --partsize                The part size to use when performing a multipart upload or download (MB) [default: 50]
   --enforceretentionperiod  If enabled then objects in the S3 bucket will only be rotated if they are older then the retention period [default: true]
   --dailyretentioncount     The number of daily objects to keep in S3 [default: 6]
   --dailyretentionperiod    The retention period (hours) that a daily object should be kept in S3 [default: 168]
@@ -33,35 +33,46 @@ Options:
   --weeklyretentionperiod   The retention period (hours) that a weekly object should be kept in S3 [default: 672]
 ```                     
 ## Examples
-### Basic Usage (Upload and Rotate)
+
+### Backups
+#### Basic Usage
 ```sh
-./GoS3GFSBackup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar
+./GoS3GFSBackup --action=backup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar
 ```
 
-### Usage Custom Rotation Policy (10 daily backups, 5 weekly backups with enforced retention period applied)
+#### Usage Custom Rotation Policy (10 daily backups, 5 weekly backups with enforced retention period applied)
 ```sh
-./GoS3GFSBackup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar --enforceretentionperiod=true --dailyretentioncount=10 --dailyretentionperiod=240 --weeklyretentioncount=5 --weeklyretentionperiod=120
+./GoS3GFSBackup --action=backup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar --enforceretentionperiod=true --dailyretentioncount=10 --dailyretentionperiod=240 --weeklyretentioncount=5 --weeklyretentionperiod=120
 ```
 
-### Usage with 5 hour timeout
+#### Usage with 5 hour timeout
 ```sh
-./GoS3GFSBackup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar --timeout=18000
+./GoS3GFSBackup --action=backup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar --timeout=18000
 ```
 
-### Upload Only (This does not alter the name of the upload)
+#### Dry run
 ```sh
-./GoS3GFSBackup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=myFileNameThatWontChangeInBucket --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar
+./GoS3GFSBackup --action=backup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar --dryrun=true
+```
+
+### Uploading
+#### Basic Usage
+```sh
+./GoS3GFSBackup --action=upload --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=myFileNameThatWontChangeInBucket --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar
 ```
 
 ### Rotation Only
+#### Basic Usage
 ```sh
-./GoS3GFSBackup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar --rotateonly=true
+./GoS3GFSBackup --action=rotate --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar
 ```
 
-### Dry run
+### Download
+#### Basic Usage
 ```sh
-./GoS3GFSBackup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar --dryrun=true
+./GoS3GFSBackup --action=download --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbumInS3 --pathtofile=/var/tmp/uploads/mydownloadedPortfolioAlbum
 ```
+
 
 If you prefer, you may set environment variables instead of using a credential file:
 ```

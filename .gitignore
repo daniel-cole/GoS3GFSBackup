@@ -1,3 +1,5 @@
 .idea/
 bigS3File*
 testBackupFile*
+localTestFile*
+localBigTestFile*

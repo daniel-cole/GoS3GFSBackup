@@ -113,12 +113,10 @@ func UploadFile(svc *s3.S3, uploadObject UploadObject, prefix string, dryRun boo
 		} else {
 			log.Error.Printf("Failed to upload file: %v\n", err)
 		}
-
 		return "", err
 	}
 
 	return s3FileName, nil
-
 }
 
 // This function attempts to track the progress of an S3 multipart upload
@@ -162,6 +160,10 @@ func validationCheck(uploadObject UploadObject) error {
 
 	if uploadObject.S3FileName == "" {
 		return errors.New("s3FileName should not be empty")
+	}
+
+	if strings.Contains(uploadObject.S3FileName, "/") {
+		return errors.New("s3FileName should not contain any '/', any directories should be specified with --bucketdir")
 	}
 
 	if uploadObject.NumWorkers < 1 {

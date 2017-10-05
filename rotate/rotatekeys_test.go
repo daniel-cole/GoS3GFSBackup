@@ -43,7 +43,6 @@ func init() {
 
 	if err != nil {
 		log.Error.Println(err)
-		os.Exit(1)
 	}
 
 	svc = s3svc
@@ -70,6 +69,12 @@ func init() {
 		WeeklyPrefix:           "weekly_",
 		MonthlyPrefix:          "monthly_",
 		EnforceRetentionPeriod: false,
+	}
+
+	err = util.CreateFile(pathToTestFile, []byte("this is just a little test file"))
+	if err != nil {
+		log.Error.Println("failed to create file required for testing: " + err.Error())
+		os.Exit(1)
 	}
 
 }

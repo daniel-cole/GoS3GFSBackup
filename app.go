@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/alexflint/go-arg"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/daniel-cole/GoS3GFSBackup/download"
 	"github.com/daniel-cole/GoS3GFSBackup/log"
 	"github.com/daniel-cole/GoS3GFSBackup/rotate"
 	"github.com/daniel-cole/GoS3GFSBackup/rpolicy"
@@ -15,14 +16,14 @@ import (
 )
 
 type args struct {
+	Action                 string `arg:"help:The intended action for the tool to run [backup|upload|download|rotate]"`
 	Region                 string `arg:"required,help:The AWS region to upload the specified file to"`
 	Bucket                 string `arg:"required,help:The S3 bucket to upload the specified file to"`
 	CredFile               string `arg:"help:The full path to the AWS CLI credential file if environment variables are not being used to provide the access id and key"`
 	Profile                string `arg:"help:The profile to use for the AWS CLI credential file"`
-	Action                 string `arg:"help:The intended action for the tool to run [backup|upload|download|rotate]"`
 	PathToFile             string `arg:"help:The full path to the file to upload to the specified S3 bucket. Must be specified unless --rotateonly=true"`
 	S3FileName             string `arg:"help:The name of the file as it should appear in the S3 bucket. Must be specified unless --rotateonly=true"`
-	BucketDir              string `arg:"help:The directory in the bucket in which to upload the S3 object to. Must include the trailing slash"`
+	BucketDir              string `arg:"help:The directory chain in the bucket in which to upload the S3 object to. Must include the trailing slash"`
 	Timeout                int    `arg:"help:The timeout to upload the specified file (seconds)"`
 	DryRun                 bool   `arg:"help:If enabled then no upload or rotation actions will be executed [default: false]"`
 	ConcurrentWorkers      int    `arg:"help:The number of threads to use when uploading the file to S3"`
@@ -99,6 +100,7 @@ func runAction(svc *s3.S3, args args) {
 }
 
 func runBackupAction(svc *s3.S3, arguments args) {
+	log.Info.Println("Backup action specified, backing up file")
 
 	rotationPolicy := getRotationPolicy(arguments)
 
@@ -106,7 +108,7 @@ func runBackupAction(svc *s3.S3, arguments args) {
 	prefix := util.GetKeyType(rotationPolicy, time.Now())
 	_, err := upload.UploadFile(svc, getUploadObject(arguments, true), prefix, arguments.DryRun)
 	if err != nil {
-		log.Error.Printf("Failed to upload file. Skipping Rotation. Reason: %v\n", err)
+		log.Error.Printf("Failed to upload file. Aborting backup. Reason: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -130,7 +132,22 @@ func runRotateAction(svc *s3.S3, arguments args) {
 	rotate.StartRotation(svc, arguments.Bucket, getRotationPolicy(arguments), arguments.DryRun)
 }
 
-func runDownloadAction(svc *s3.S3, args args) {
+func runDownloadAction(svc *s3.S3, arguments args) {
+	log.Info.Println("Download action specified, downloading file")
+
+	downloadObject := download.DownloadObject{
+		DownloadLocation: arguments.PathToFile,
+		S3FileKey:        arguments.S3FileName,
+		BucketDir:        arguments.BucketDir,
+		Bucket:           arguments.Bucket,
+		NumWorkers:       arguments.ConcurrentWorkers,
+		PartSize:         arguments.PartSize,
+	}
+	err := download.DownloadFile(svc, downloadObject)
+	if err != nil {
+		log.Error.Printf("Failed to download file. Aborting. Reason: %v\n", err)
+		os.Exit(1)
+	}
 
 }
 
@@ -170,7 +187,7 @@ func getRotationPolicy(arguments args) rpolicy.RotationPolicy {
 }
 
 func logArgs(arguments args) {
-	log.Info.Println("Starting GoS3GFSBackup with arguments: ")
+	log.Info.Println("Loaded GoS3GFSBackup with arguments: ")
 
 	log.Info.Println("--credfile=" + arguments.CredFile)
 	log.Info.Println("--region=" + arguments.Region)
