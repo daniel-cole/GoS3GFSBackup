@@ -87,10 +87,12 @@ AWS_SECRET_ACCESS_KEY=<secret access key>
 
 ## Notes About Behaviour
 1. An incomplete multipart upload object will be left in the S3 bucket if the upload fails due to a timeout. A policy should be set on the bucket to remove multipart upload objects after a certain period of time.
-2. In addition to the 'daily_', 'weekly_', 'monthly_' prefix, a timestamp will be added as a suffix (i.e. 20170115T002115) to any file uploaded using this tool. The exception to this is if the justuploadflag is enabled.
+2. In addition to the 'daily_', 'weekly_', 'monthly_' prefix, a timestamp will be added as a suffix (i.e. 20170115T002115) to any file uploaded using the backup option.
 
 ## Limitations
-1. The progress tracking implemented for uploads is only to provide a rough idea of how the upload is progressing. There seems to be limitations around tracking the progress of a multipart upload using the AWS SDK for Go. 
+1. The progress tracking implemented for uploads is only to provide a rough idea of how the upload is progressing. This is due to:
+    * Limitations with S3 manager progress tracking
+    * The progress tracking checks the amount of upload parts which is limited to 1000 per request
 
 ## Testing
 
@@ -105,6 +107,7 @@ AWS_REGION=<AWS region where the buckets for testing exist>
 AWS_BUCKET_UPLOAD=<AWS bucket specifically for upload testing>
 AWS_BUCKET_ROTATION=<AWS bucket specifically for rotation testing>
 AWS_BUCKET_FORBIDDEN=<AWS bucket that user running tests does not have permission to access>
+AWS_BUCKET_DOWNLOAD=<AWS bucket specifically for download testing>
 ```
 
 If you're providing credentials via env:
@@ -116,4 +119,5 @@ AWS_REGION=<AWS region where the buckets for testing exist>
 AWS_BUCKET_UPLOAD=<AWS bucket specifically for upload testing>
 AWS_BUCKET_ROTATION=<AWS bucket specifically for rotation testing>
 AWS_BUCKET_FORBIDDEN=<AWS bucket that user running tests does not have permission to access>
+AWS_BUCKET_DOWNLOAD=<AWS bucket specifically for download testing>
 ```
