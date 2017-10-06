@@ -47,7 +47,6 @@ func UploadFile(svc *s3.S3, uploadObject UploadObject, prefix string, dryRun boo
 	defer file.Close()
 
 	if err != nil {
-		log.Error.Printf("Failed to open file '%s', %v\n", uploadObject.PathToFile, err)
 		return "", err
 	}
 
@@ -108,11 +107,6 @@ func UploadFile(svc *s3.S3, uploadObject UploadObject, prefix string, dryRun boo
 	finishedCh <- true // Stop checking for upload
 
 	if err != nil {
-		if strings.Contains(err.Error(), "context deadline exceeded") {
-			log.Error.Printf("failed to upload file due to upload time exceeding specified timeout %v\n", err)
-		} else {
-			log.Error.Printf("Failed to upload file: %v\n", err)
-		}
 		return "", err
 	}
 
@@ -125,7 +119,7 @@ func UploadFile(svc *s3.S3, uploadObject UploadObject, prefix string, dryRun boo
 // To the file size is low. i.e. 1 worker for 200MiB. 5 workers for 5GiB
 func checkUploadProgress(svc *s3.S3, s3FileName string, bucket string, partSize int64, totalParts int64, uploadFinishedCh <-chan bool) {
 	log.Info.Println("Attempting to display progress of upload. This will give a very rough estimate of progress, " +
-		"especially if the upload is being handled by multiple workers")
+		"especially if the upload is being handled by multiple workers. Only a maximum of 1000 parts will be displayed")
 	for { // Loop will only exit once channel has been updated
 		time.Sleep(time.Second * 30) // Sleep first to allow time for multi-part upload to start
 		select {
