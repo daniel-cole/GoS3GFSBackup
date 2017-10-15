@@ -50,7 +50,7 @@ func DownloadFile(svc *s3.S3, downloadObject DownloadObject) error {
 		return err
 	}
 
-	log.Info.Println("Downloading complete. '%s' has been written to '%s'", downloadObject.S3FileKey, downloadObject.DownloadLocation)
+	log.Info.Printf("Downloading complete. '%s' has been written to '%s'", downloadObject.S3FileKey, downloadObject.DownloadLocation)
 
 	return nil
 

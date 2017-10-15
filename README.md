@@ -37,40 +37,40 @@ Options:
 ### Backups
 #### Basic Usage
 ```sh
-./GoS3GFSBackup --action=backup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar
+./GoS3GFSBackup --action=backup --credfile=/backupuser/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar
 ```
 
 #### Usage Custom Rotation Policy (10 daily backups, 5 weekly backups with enforced retention period applied)
 ```sh
-./GoS3GFSBackup --action=backup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar --enforceretentionperiod=true --dailyretentioncount=10 --dailyretentionperiod=240 --weeklyretentioncount=5 --weeklyretentionperiod=120
+./GoS3GFSBackup --action=backup --credfile=/backupuser/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar --enforceretentionperiod=true --dailyretentioncount=10 --dailyretentionperiod=240 --weeklyretentioncount=5 --weeklyretentionperiod=120
 ```
 
 #### Usage with 5 hour timeout
 ```sh
-./GoS3GFSBackup --action=backup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar --timeout=18000
+./GoS3GFSBackup --action=backup --credfile=/backupuser/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar --timeout=18000
 ```
 
 #### Dry run
 ```sh
-./GoS3GFSBackup --action=backup --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar --dryrun=true
+./GoS3GFSBackup --action=backup --credfile=/backupuser/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar --dryrun=true
 ```
 
 ### Uploading
 #### Basic Usage
 ```sh
-./GoS3GFSBackup --action=upload --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=myFileNameThatWontChangeInBucket --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar
+./GoS3GFSBackup --action=upload --credfile=/backupuser/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=myFileNameThatWontChangeInBucket --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar
 ```
 
 ### Rotation Only
 #### Basic Usage
 ```sh
-./GoS3GFSBackup --action=rotate --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar
+./GoS3GFSBackup --action=rotate --credfile=/backupuser/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbum --pathtofile=/var/tmp/uploads/portfolioAlbum2007.tar
 ```
 
 ### Download
 #### Basic Usage
 ```sh
-./GoS3GFSBackup --action=download --credfile=~/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbumInS3 --pathtofile=/var/tmp/uploads/mydownloadedPortfolioAlbum
+./GoS3GFSBackup --action=download --credfile=/backupuser/.aws_creds --region=us-east-1 --bucket=mybucket --s3filename=portfolioAlbumInS3 --pathtofile=/var/tmp/uploads/mydownloadedPortfolioAlbum
 ```
 
 
