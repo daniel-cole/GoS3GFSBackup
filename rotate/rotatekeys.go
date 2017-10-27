@@ -102,7 +102,7 @@ func keyRotation(svc *s3.S3, bucket string, retentionPeriod time.Duration, reten
 			// If the retention period is not enforced then the key will be removed and a warning logged
 			if keyAge <= retentionPeriod {
 				if enforceRetentionPeriod {
-					log.Error.Printf("Key: '%s' is in violation of retention policy count. However, enforce "+
+					log.Warn.Printf("Key: '%s' is in violation of retention policy count. However, enforce "+
 						"retention period is enabled and the total time elapsed since the key was last modified is "+
 						"%0.1f hours / %0.1f minutes. This is less than the retention period of %0.1f hours / %0.1f minutes. "+
 						"This key is not eligible for deletion until the retention period has elapsed\n", key, keyAgeHours,
